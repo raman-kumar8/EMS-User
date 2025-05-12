@@ -1,5 +1,6 @@
 package com.example.emsuser.controller;
 
+import com.example.emsuser.dto.UpdateDTO;
 import com.example.emsuser.dto.UserLoginDTO;
 import com.example.emsuser.dto.UserRegisterDTO;
 import com.example.emsuser.dto.UserResponseDTO;
@@ -12,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+
+import java.util.UUID;
 
 
 @RestController
@@ -41,6 +44,14 @@ public class UserController {
     ) {
 
         return userService.login(loginDTO, response);
+
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<UserResponseDTO> updateUser(@CookieValue("jwt_token") String token, @RequestBody UpdateDTO updateDTO) {
+
+       ResponseEntity<UserResponseDTO> userResponseDTO =   userService.update(token,updateDTO);
+    return userResponseDTO;
 
     }
 
