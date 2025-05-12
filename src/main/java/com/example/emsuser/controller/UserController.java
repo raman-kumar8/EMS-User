@@ -3,6 +3,7 @@ package com.example.emsuser.controller;
 import com.example.emsuser.dto.UserLoginDTO;
 import com.example.emsuser.dto.UserRegisterDTO;
 import com.example.emsuser.dto.UserResponseDTO;
+import com.example.emsuser.exception.CustomException;
 import com.example.emsuser.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,8 @@ public class UserController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserResponseDTO registerUser(@RequestBody @Valid UserRegisterDTO userRegisterDTO) {
+    public UserResponseDTO registerUser(@Valid @RequestBody  UserRegisterDTO userRegisterDTO) {
+
         return userService.registerUser(userRegisterDTO);
     }
 
