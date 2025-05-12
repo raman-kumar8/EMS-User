@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserRoleService {
@@ -25,9 +26,9 @@ public class UserRoleService {
 
 
 
-
-    // Get role by ID
-    public Optional<UserRoleModel> getRoleById(Long id) {
-        return userRoleRepository.findById(id);
+    // Get role by user ID
+    public Optional<UserRoleModel> getRoleByUserId(UUID userId) {
+        return userRoleRepository.findByUserId(userId);
     }
+
 }

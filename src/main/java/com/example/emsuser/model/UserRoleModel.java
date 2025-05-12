@@ -12,9 +12,10 @@ public class UserRoleModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // Make this ID auto-generated (or UUID if needed)
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)  // Foreign key to User_Model
-    private UserModel user;  // Link the User_Role_Model to the User_Model
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private UserModel user;
+
 
     @Column(nullable = false)
     private String role;  // Role field for storing the user's role

@@ -32,7 +32,7 @@ public class UserModel {
     @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 
-    private String token;
+
     private Date tokenExpiry;
     private Date lastLogin;
 
@@ -44,7 +44,8 @@ public class UserModel {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    // Bidirectional relationship: One user can have many roles
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserRoleModel> roles;  // List of roles associated with this user
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserRoleModel role;
+
+
 }

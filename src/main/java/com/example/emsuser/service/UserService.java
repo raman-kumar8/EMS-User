@@ -42,25 +42,19 @@ public class UserService {
         user.setEmail(userRegisterDTO.getEmail());
         user.setPassword(encodedPassword);
 
-        // Save user without token first (we need user ID for token)
+        // Save user first so it gets an ID (needed for FK in role)
         UserModel savedUser = userRepository.save(user);
 
-        // Create role
+        // Create and assign role
         UserRoleModel userRole = new UserRoleModel();
         userRole.setUser(savedUser);
         userRole.setRole(userRegisterDTO.getRole());
         userRoleRepository.save(userRole);
 
-        // Now generate JWT token using user ID and role
-        String jwtToken = jwtTokenProvider.generateToken(savedUser.getId(), userRegisterDTO.getRole());
-        savedUser.setToken(jwtToken);
-        savedUser.setTokenExpiry(new Date(System.currentTimeMillis() + 86400000)); // 1 day
-        savedUser.setLastLogin(new Date());
 
-        // Save user again with token info
-        userRepository.save(savedUser);
 
         return new UserResponseDTO(savedUser.getName(), savedUser.getEmail(), userRole.getRole());
     }
+
 
 }
