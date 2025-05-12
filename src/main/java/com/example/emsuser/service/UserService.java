@@ -13,6 +13,7 @@ import com.example.emsuser.security.JwtTokenProvider;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,7 +43,7 @@ UserService {
     private PasswordEncoder passwordEncoder;
 
 
-    public UserResponseDTO registerUser(UserRegisterDTO userRegisterDTO) {
+    public ResponseEntity<UserResponseDTO> registerUser(UserRegisterDTO userRegisterDTO) {
 
         if (userRepository.existsByEmail(userRegisterDTO.getEmail())) {
             throw new CustomException("Email is already in use");
@@ -65,8 +66,8 @@ UserService {
         userRoleRepository.save(userRole);
 
 
-
-        return new UserResponseDTO(savedUser.getName(), savedUser.getEmail(), userRole.getRole());
+     UserResponseDTO responseDTO = new UserResponseDTO(savedUser.getName(), savedUser.getEmail(), userRole.getRole());
+        return ResponseEntity.ok().body(responseDTO);
     }
 
 
@@ -91,7 +92,7 @@ UserService {
         Cookie cookie = new Cookie("jwt_token", token);
 
         cookie.setHttpOnly(true); // prevent JS access
-
+       cookie.setSecure(true);
         cookie.setPath("/");      // available to all endpoints
 
         cookie.setMaxAge(7 * 24 * 60 * 60); // 1 week
