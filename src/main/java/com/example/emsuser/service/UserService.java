@@ -1,5 +1,6 @@
 package com.example.emsuser.service;
 
+import com.example.emsuser.dto.UpdateDTO;
 import com.example.emsuser.dto.UserLoginDTO;
 import com.example.emsuser.dto.UserRegisterDTO;
 import com.example.emsuser.dto.UserResponseDTO;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class
@@ -67,7 +69,6 @@ UserService {
         return new UserResponseDTO(savedUser.getName(), savedUser.getEmail(), userRole.getRole());
     }
 
-    @PostMapping("/login")
 
     public ResponseEntity<UserResponseDTO> login(@RequestBody UserLoginDTO loginDTO, HttpServletResponse response) {
 
@@ -104,6 +105,43 @@ UserService {
         UserResponseDTO responseDTO = new UserResponseDTO(user.getName(), user.getEmail(), user.getRole().getRole());
 
         return ResponseEntity.ok().body(responseDTO);
+
+    }
+
+    public ResponseEntity<UserResponseDTO> update(String token, UpdateDTO updateDTO) {
+
+       UUID userId = jwtTokenProvider.getUserIdFromJWT(token);
+
+            UserModel user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found with id: "));
+
+
+
+
+            // Update only non-null fields from DTO
+            if (updateDTO.getName() != null) {
+                user.setName(updateDTO.getName());
+            }
+
+
+        if (updateDTO.getEmail() != null && !updateDTO.getEmail().equals(user.getEmail())) {
+            if (userRepository.existsByEmail(updateDTO.getEmail())) {
+                throw new CustomException("Email is already in use");
+            }
+            user.setEmail(updateDTO.getEmail());
+        }
+
+
+            // Save the updated user
+            UserModel updatedUser = userRepository.save(user);
+
+            // Convert to DTO and return
+            UserResponseDTO responseDTO = new UserResponseDTO();
+            responseDTO.setName(updatedUser.getName());
+            responseDTO.setEmail(updatedUser.getEmail());
+
+            return ResponseEntity.ok(responseDTO);
+
 
     }
 
