@@ -1,9 +1,11 @@
 package com.example.emsuser.controller;
 
+import com.example.emsuser.dto.UserLoginDTO;
 import com.example.emsuser.dto.UserRegisterDTO;
 import com.example.emsuser.dto.UserResponseDTO;
 import com.example.emsuser.exception.CustomException;
 import com.example.emsuser.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,4 +27,23 @@ public class UserController {
 
         return userService.registerUser(userRegisterDTO);
     }
+
+    @PostMapping("/login")
+
+    @ResponseStatus(HttpStatus.OK)
+
+    public ResponseEntity<UserResponseDTO> loginUser(
+
+            @RequestBody @Valid UserLoginDTO loginDTO,
+
+            HttpServletResponse response
+
+    ) {
+
+        return userService.login(loginDTO, response);
+
+    }
+
+
+
 }

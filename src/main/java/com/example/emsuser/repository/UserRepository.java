@@ -8,5 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<UserModel, UUID> {
-    boolean existsByEmail(@Email(message = "Invalid email format") @NotBlank(message = "Email cannot be blank") String email);
+    boolean existsByEmail(String email);
+    UserModel findByEmail(String email);
 }

@@ -47,5 +47,11 @@ public class UserModel {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserRoleModel role;
 
+    @Override
+    public String toString() {
+        return "UserModel{id=" + id + ", email='" + email + "'}";
+    }
+
+
 
 }
