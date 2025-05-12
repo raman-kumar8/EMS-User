@@ -2,6 +2,7 @@ package com.example.emsuser.service;
 
 import com.example.emsuser.dto.UserRegisterDTO;
 import com.example.emsuser.dto.UserResponseDTO;
+import com.example.emsuser.exception.CustomException;
 import com.example.emsuser.model.UserModel;
 import com.example.emsuser.model.UserRoleModel;
 import com.example.emsuser.repository.UserRepository;
@@ -31,8 +32,9 @@ public class UserService {
 
 
     public UserResponseDTO registerUser(UserRegisterDTO userRegisterDTO) {
+
         if (userRepository.existsByEmail(userRegisterDTO.getEmail())) {
-            throw new IllegalArgumentException("Email is already in use");
+            throw new CustomException("Email is already in use");
         }
 
         String encodedPassword = passwordEncoder.encode(userRegisterDTO.getPassword());
