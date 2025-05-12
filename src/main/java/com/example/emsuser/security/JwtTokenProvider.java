@@ -14,7 +14,7 @@ public class JwtTokenProvider {
 
     private final long jwtExpirationInMs = 86400000; // 1 day
     private final String jwtSecret = "v3ryS3cur3K3yGen3ratedForHS512With64BytesOfEntropy!!12345678";
-    private final Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
 
 

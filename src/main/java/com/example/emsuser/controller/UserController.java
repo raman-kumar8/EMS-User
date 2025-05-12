@@ -1,10 +1,13 @@
 package com.example.emsuser.controller;
 
+import com.example.emsuser.dto.UserLoginDTO;
 import com.example.emsuser.dto.UserRegisterDTO;
 import com.example.emsuser.dto.UserResponseDTO;
 import com.example.emsuser.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -22,4 +25,23 @@ public class UserController {
     public UserResponseDTO registerUser(@RequestBody @Valid UserRegisterDTO userRegisterDTO) {
         return userService.registerUser(userRegisterDTO);
     }
+
+    @PostMapping("/login")
+
+    @ResponseStatus(HttpStatus.OK)
+
+    public ResponseEntity<UserResponseDTO> loginUser(
+
+            @RequestBody @Valid UserLoginDTO loginDTO,
+
+            HttpServletResponse response
+
+    ) {
+
+        return userService.login(loginDTO, response);
+
+    }
+
+
+
 }
