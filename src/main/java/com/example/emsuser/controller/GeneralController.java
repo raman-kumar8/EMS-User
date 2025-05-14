@@ -41,4 +41,14 @@ public class GeneralController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/user1")
+    public ResponseEntity<UserDetailsResponseDTo> getUserByID(UUID userId){
+
+        UserModel user = userService.getUserById(userId);
+        UserDetailsResponseDTo response = new UserDetailsResponseDTo();
+        response.setName(user.getName());
+        response.setEmail(user.getEmail());
+        response.setRole(user.getRole().getRole());
+        return ResponseEntity.ok(response);
+    }
 }
