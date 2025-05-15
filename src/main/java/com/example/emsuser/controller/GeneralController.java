@@ -1,6 +1,6 @@
 package com.example.emsuser.controller;
 
-import com.example.emsuser.dto.UserDetailsResponseDTo;
+import com.example.emsuser.dto.UserDetailsResponseDTO;
 import com.example.emsuser.model.UserModel;
 import com.example.emsuser.security.JwtTokenProvider;
 import com.example.emsuser.service.UserService;
@@ -31,10 +31,10 @@ public class GeneralController {
 
     }
     @GetMapping("/user")
-    public ResponseEntity<UserDetailsResponseDTo> getUserDetails(@CookieValue("jwt_token") String token){
+    public ResponseEntity<UserDetailsResponseDTO> getUserDetails(@CookieValue("jwt_token") String token){
         UUID userId = jwtTokenProvider.getUserIdFromJWT(token);
         UserModel user = userService.getUserById(userId);
-        UserDetailsResponseDTo response = new UserDetailsResponseDTo();
+        UserDetailsResponseDTO response = new UserDetailsResponseDTO();
         response.setName(user.getName());
         response.setEmail(user.getEmail());
         response.setRole(user.getRole().getRole());
@@ -42,10 +42,10 @@ public class GeneralController {
     }
 
     @GetMapping("/user1")
-    public ResponseEntity<UserDetailsResponseDTo> getUserByID(UUID userId){
+    public ResponseEntity<UserDetailsResponseDTO> getUserByID(UUID userId){
 
         UserModel user = userService.getUserById(userId);
-        UserDetailsResponseDTo response = new UserDetailsResponseDTo();
+        UserDetailsResponseDTO response = new UserDetailsResponseDTO();
         response.setName(user.getName());
         response.setEmail(user.getEmail());
         response.setRole(user.getRole().getRole());
