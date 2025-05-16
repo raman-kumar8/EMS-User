@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: emsdb
+      POSTGRES_USER: emsuser
+      POSTGRES_PASSWORD: emspassword
+    ports:
+      - "5432:5432"
+
+  app:
+    image: ems-user:latest
+    depends_on:
+      - db
+    environment:
+      DB_URL1: jdbc:postgresql://db:5432/emsdb
+      DB_USERNAME1: emsuser
+      DB_PASSWORD1: emspassword
+      SECRET_KEY: 21321313slfakd123ljlkjdfslkfjlkj12l3jlkjklsjdlfkjlk12j3lkjlkjsdflkjlk12j3lkjkljsdklfjslkj123kljlk3j1lk23j1l2k3jlksjdlksjfsklfjslkfjslkfslkfsjlkj12lkj23lk21j31kl3j12lk3j12lk3jlkj23kljl2k5jkljfklsjfkljfklj2kljkljsfkljflskjf
+    ports:
+      - "8080:8080"
