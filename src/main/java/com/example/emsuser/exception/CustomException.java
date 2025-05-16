@@ -1,6 +1,6 @@
 package com.example.emsuser.exception;
 
-import lombok.Data;
+
 
 
 public class CustomException extends RuntimeException {

@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
-import java.util.UUID;
+
 
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -50,8 +50,7 @@ public class UserController {
     @PutMapping("/update")
     public ResponseEntity<UserResponseDTO> updateUser(@CookieValue("jwt_token") String token, @RequestBody UpdateDTO updateDTO) {
 
-       ResponseEntity<UserResponseDTO> userResponseDTO =   userService.update(token,updateDTO);
-    return userResponseDTO;
+        return userService.update(token,updateDTO);
 
     }
 

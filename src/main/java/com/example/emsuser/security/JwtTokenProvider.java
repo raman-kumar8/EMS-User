@@ -17,7 +17,7 @@ public class JwtTokenProvider {
     @Value("${SecretKey}")
     private String jwtSecret;
 
-    private final long jwtExpirationInMs = 86400000; // 1 day
+    private final long jwtExpirationInMs = (86400000)*3; // 1 day
 
     private Key key = null;
 

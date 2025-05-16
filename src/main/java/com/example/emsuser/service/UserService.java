@@ -82,12 +82,11 @@ UserService {
             throw new RuntimeException("Invalid password");
 
         }
-        System.out.println(user);
+
 
         String token = jwtTokenProvider.generateToken(user.getId(), String.valueOf(user.getRole()));
 
-        // Set token in cookie
-        System.out.println(token);
+
 
         Cookie cookie = new Cookie("jwt_token", token);
 
