@@ -10,7 +10,7 @@ services:
       - "5433:5432"
 
   app:
-    image: ems-user:latest
+    build : ./
     depends_on:
       - db
     environment:
@@ -20,3 +20,4 @@ services:
       SECRET_KEY: 21321313slfakd123ljlkjdfslkfjlkj12l3jlkjklsjdlfkjlk12j3lkjlkjsdflkjlk12j3lkjkljsdklfjslkj123kljlk3j1lk23j1l2k3jlksjdlksjfsklfjslkfjslkfslkfsjlkj12lkj23lk21j31kl3j12lk3j12lk3jlkj23kljl2k5jkljfklsjfkljfklj2kljkljsfkljflskjf
     ports:
       - "8080:8080"
+

@@ -1,10 +1,12 @@
 package com.example.emsuser.controller;
 
 import com.example.emsuser.dto.UserDetailsResponseDTo;
+import com.example.emsuser.exception.CustomException;
 import com.example.emsuser.model.UserModel;
 import com.example.emsuser.security.JwtTokenProvider;
 import com.example.emsuser.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,8 @@ public class GeneralController {
    private JwtTokenProvider jwtTokenProvider;
     @GetMapping("/validate")
     public String validate(@CookieValue("jwt_token") String token) {
+
+
         UUID userId = jwtTokenProvider.getUserIdFromJWT(token);
         if(userId==null){
             throw new RuntimeException("Invalid token");

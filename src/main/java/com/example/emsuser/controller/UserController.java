@@ -6,6 +6,7 @@ import com.example.emsuser.dto.UserRegisterDTO;
 import com.example.emsuser.dto.UserResponseDTO;
 import com.example.emsuser.exception.CustomException;
 import com.example.emsuser.service.UserService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("users")
 @RequiredArgsConstructor
+
 public class UserController {
 
     private final UserService userService;
@@ -45,6 +47,20 @@ public class UserController {
 
         return userService.login(loginDTO, response);
 
+    }
+    @GetMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletResponse response) {
+
+
+        Cookie cookie = new Cookie("jwt_token", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // Deletes the cookie
+
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok("Logged out successfully");
     }
 
     @PutMapping("/update")
