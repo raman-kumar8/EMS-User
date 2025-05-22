@@ -54,7 +54,7 @@ public class UserController {
 
         Cookie cookie = new Cookie("jwt_token", null);
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge(0); // Deletes the cookie
 

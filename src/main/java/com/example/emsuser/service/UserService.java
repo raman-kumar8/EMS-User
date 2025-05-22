@@ -92,7 +92,7 @@ UserService {
         Cookie cookie = new Cookie("jwt_token", token);
 
         cookie.setHttpOnly(true); // prevent JS access
-       cookie.setSecure(true);
+       cookie.setSecure(false);
         cookie.setPath("/");      // available to all endpoints
 
         cookie.setMaxAge(7 * 24 * 60 * 60); // 1 week
