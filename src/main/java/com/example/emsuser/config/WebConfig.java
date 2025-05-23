@@ -15,6 +15,7 @@ public class WebConfig {
                 registry.addMapping("/**")
 
 
+
                         .allowedOriginPatterns("*")  // More flexible than allowedOrigins
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")

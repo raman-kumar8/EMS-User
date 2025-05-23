@@ -14,6 +14,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
@@ -89,15 +91,16 @@ UserService {
 
 
 
-        Cookie cookie = new Cookie("jwt_token", token);
+        ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", token)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(Duration.ofDays(7))
+                .sameSite("Lax") // <--- THIS IS WHAT YOU'RE MISSING
+                .build();
 
-        cookie.setHttpOnly(true); // prevent JS access
-       cookie.setSecure(false);
-        cookie.setPath("/");      // available to all endpoints
+        response.addHeader("Set-Cookie", jwtCookie.toString());
 
-        cookie.setMaxAge(7 * 24 * 60 * 60); // 1 week
-
-        response.addCookie(cookie);
 
         user.setLastLogin(new Date());
 

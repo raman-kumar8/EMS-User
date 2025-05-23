@@ -10,12 +10,13 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
-
+import java.time.Duration;
 
 
 @RestController
@@ -52,13 +53,16 @@ public class UserController {
     public ResponseEntity<String> logout(HttpServletResponse response) {
 
 
-        Cookie cookie = new Cookie("jwt_token", null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        cookie.setMaxAge(0); // Deletes the cookie
+        ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", null)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(Duration.ofDays(7))
+                .sameSite("Lax")
+                .build();
 
-        response.addCookie(cookie);
+        response.addHeader("Set-Cookie", jwtCookie.toString());
+
 
         return ResponseEntity.ok("Logged out successfully");
     }
