@@ -118,6 +118,10 @@ UserService {
     public ResponseEntity<UserResponseDTO> update(String token, UpdateDTO updateDTO) {
 
        UUID userId = jwtTokenProvider.getUserIdFromJWT(token);
+       if(userId==null)
+       {
+           throw new CustomException("Invalid token");
+       }
 
             UserModel user = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("User not found with id: "));
@@ -126,7 +130,7 @@ UserService {
 
 
             // Update only non-null fields from DTO
-            if (updateDTO.getName() != null) {
+            if (updateDTO.getName() != null && !updateDTO.getName().equals(user.getName())) {
                 user.setName(updateDTO.getName());
             }
 
@@ -137,6 +141,12 @@ UserService {
             }
             user.setEmail(updateDTO.getEmail());
         }
+        if(updateDTO.getRole()!=null && !updateDTO.getRole().equals(user.getRole().getRole()))
+        {
+            UserRoleModel userRole = user.getRole();
+                    userRole.setRole(updateDTO.getRole());
+            userRoleRepository.save(userRole);
+        }
 
 
             // Save the updated user
@@ -146,6 +156,7 @@ UserService {
             UserResponseDTO responseDTO = new UserResponseDTO();
             responseDTO.setName(updatedUser.getName());
             responseDTO.setEmail(updatedUser.getEmail());
+            responseDTO.setRole(updatedUser.getRole().getRole());
 
             return ResponseEntity.ok(responseDTO);
 
