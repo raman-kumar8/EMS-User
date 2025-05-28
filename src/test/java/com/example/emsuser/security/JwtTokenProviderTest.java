@@ -80,14 +80,11 @@ class JwtTokenProviderTest {
     }
 
     @Test
-    void validateToken_WithInvalidToken_ReturnsFalse() {
+    void validateToken_WithInvalidToken_ThrowsCustomException() {
         // Arrange
         String invalidToken = "invalid.token.string";
 
-        // Act
-        boolean result = jwtTokenProvider.validateToken(invalidToken);
-
-        // Assert
-        assertFalse(result);
+        // Act & Assert
+        assertThrows(CustomException.class, () -> jwtTokenProvider.validateToken(invalidToken));
     }
 }

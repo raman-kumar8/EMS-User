@@ -48,15 +48,15 @@ UserService {
 
     public ResponseEntity<UserResponseDTO> registerUser(UserRegisterDTO userRegisterDTO) {
 
-        if (userRepository.existsByEmail(userRegisterDTO.getEmail())) {
+        if (userRepository.existsByEmail(userRegisterDTO.getEmail().toLowerCase())) {
             throw new CustomException("Email is already in use");
         }
 
         String encodedPassword = passwordEncoder.encode(userRegisterDTO.getPassword());
 
         UserModel user = new UserModel();
-        user.setName(userRegisterDTO.getName());
-        user.setEmail(userRegisterDTO.getEmail());
+        user.setName(userRegisterDTO.getName().toLowerCase());
+        user.setEmail(userRegisterDTO.getEmail().toLowerCase());
         user.setPassword(encodedPassword);
 
         // Save user first so it gets an ID (needed for FK in role)
@@ -65,7 +65,7 @@ UserService {
         // Create and assign role
         UserRoleModel userRole = new UserRoleModel();
         userRole.setUser(savedUser);
-        userRole.setRole(userRegisterDTO.getRole());
+        userRole.setRole(userRegisterDTO.getRole().toUpperCase());
         userRoleRepository.save(userRole);
 
 
@@ -76,7 +76,7 @@ UserService {
 
     public ResponseEntity<UserResponseDTO> login(@RequestBody UserLoginDTO loginDTO, HttpServletResponse response) {
 
-        Optional<UserModel> userOpt = Optional.ofNullable(userRepository.findByEmail(loginDTO.getEmail()));
+        Optional<UserModel> userOpt = Optional.ofNullable(userRepository.findByEmail(loginDTO.getEmail().toLowerCase()));
 
         UserModel user = userOpt.orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -131,7 +131,7 @@ UserService {
 
             // Update only non-null fields from DTO
             if (updateDTO.getName() != null && !updateDTO.getName().equals(user.getName())) {
-                user.setName(updateDTO.getName());
+                user.setName(updateDTO.getName().toLowerCase());
             }
 
 
@@ -139,12 +139,12 @@ UserService {
             if (userRepository.existsByEmail(updateDTO.getEmail())) {
                 throw new CustomException("Email is already in use");
             }
-            user.setEmail(updateDTO.getEmail());
+            user.setEmail(updateDTO.getEmail().toLowerCase());
         }
         if(updateDTO.getRole()!=null && !updateDTO.getRole().equals(user.getRole().getRole()))
         {
             UserRoleModel userRole = user.getRole();
-                    userRole.setRole(updateDTO.getRole());
+                    userRole.setRole(updateDTO.getRole().toUpperCase());
             userRoleRepository.save(userRole);
         }
 
