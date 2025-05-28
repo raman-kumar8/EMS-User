@@ -28,7 +28,7 @@ public class GeneralController {
 
         UUID userId = jwtTokenProvider.getUserIdFromJWT(token);
         if(userId==null){
-            throw new RuntimeException("Invalid token");
+            throw new CustomException("Invalid token");
         }
 
         return userId.toString();
