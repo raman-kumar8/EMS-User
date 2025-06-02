@@ -1,6 +1,12 @@
 version: "3.8"
+
+networks:
+  ems_network:
+    driver: bridge
+
 services:
-  db:
+  # Postgres DB for EMS User Service
+  user-db:
     image: postgres:16
     environment:
       POSTGRES_DB: emsdb
@@ -9,22 +15,216 @@ services:
     ports:
       - "5433:5432"
     networks:
-      - ems-network
+      - ems_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U emsuser -d emsdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  userservice:
-    build: ./
-    depends_on:
-      - db
+  # Postgres DB for EMS Task Service
+  task-db:
+    image: postgres:16
     environment:
-      DB_URL1: jdbc:postgresql://db:5432/emsdb
-      DB_USERNAME1: emsuser
-      DB_PASSWORD1: emspassword
-      SECRET_KEY: 21321313slfakd123ljlkjdfslkfjlkj12l3jlkjklsjdlfkjlk12j3lkjlkjsdflkjlk12j3lkjkljsdklfjslkj123kljlk3j1lk23j1l2k3jlksjdlksjfsklfjslkfjslkfslkfsjlkj12lkj23lk21j31kl3j12lk3j12lk3jlkj23kljl2k5jkljfklsjfkljfklj2kljkljsfkljflskjf
+      POSTGRES_DB: emsdb
+      POSTGRES_USER: emsuser
+      POSTGRES_PASSWORD: 00000000
+    ports:
+      - "5434:5432"
+    networks:
+      - ems_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U emsuser -d emsdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# Postgres DB for EMS Leave Service
+  leave-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: emsdb
+      POSTGRES_USER: emsuser
+      POSTGRES_PASSWORD: 00000000
+    ports:
+      - "5436:5432"
+    networks:
+      - ems_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U emsuser -d emsdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Postgres DB for EMS Reporting Service
+  report-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: emsdb
+      POSTGRES_USER: emsuser
+      POSTGRES_PASSWORD: reportpassword
+    ports:
+      - "5435:5432"
+    networks:
+      - ems_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U emsuser -d emsdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Zookeeper
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+    networks:
+      - ems_network
+    healthcheck:
+      test: echo srvr | nc zookeeper 2181 || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Kafka
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - ems_network
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # EMS User Service
+  ems-user:
+    build:
+      context: ./EMS-User
+    image: ems-user:latest
+    depends_on:
+      user-db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://user-db:5432/emsdb
+      SPRING_DATASOURCE_USERNAME: emsuser
+      SPRING_DATASOURCE_PASSWORD: emspassword
+      SECRET_KEY: adfasfjdasflajfal;jfal;jfal;jf;aljfal;jfal;kjfla;fjaklsdjfaskldjfadl;kfj;adslfjdkl;asfjdakl;fjdal;dfjdald;kfjasl;dkjfalsk;dfjasldk;fjalskd;fjasldk;fjasldk;fjas;ldkfjaskl;dfjasl;dkfj
     ports:
       - "8080:8080"
     networks:
-      - ems-network
+      - ems_network
 
-networks:
-  ems-network:
-    external: true
+  # EMS Task Service
+  ems-task:
+    build:
+      context: ./EMS-Task
+    image: ems-task:latest
+    depends_on:
+      task-db:
+        condition: service_healthy
+      ems-user:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://task-db:5432/emsdb
+      SPRING_DATASOURCE_USERNAME: emsuser
+      SPRING_DATASOURCE_PASSWORD: 00000000
+      USER_URL: http://ems-user:8080/api/v1
+    ports:
+      - "8081:8080"
+    networks:
+      - ems_network
+
+# EMS Leave Service
+  ems-leave:
+    build:
+      context: ./leavesystem
+    image: ems-leave:latest
+    depends_on:
+      leave-db:
+        condition: service_healthy
+      ems-user:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://leave-db:5432/emsdb
+      SPRING_DATASOURCE_USERNAME: emsuser
+      SPRING_DATASOURCE_PASSWORD: 00000000
+      USER_URL: http://ems-user:8080/api/v1
+    ports:
+      - "8083:8081"
+    networks:
+      - ems_network
+
+  # EMS Reporting Service
+  ems-report:
+    build:
+      context: ./EMS-Report
+    image: ems-report:latest
+    depends_on:
+      report-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      ems-task:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://report-db:5432/emsdb
+      SPRING_DATASOURCE_USERNAME: emsuser
+      SPRING_DATASOURCE_PASSWORD: reportpassword
+      TASK_URL: http://ems-task:8080
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_CONSUMER_GROUP_ID: ems-report-group
+    ports:
+      - "8082:8080"
+    networks:
+      - ems_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+
+
+  # frontend:
+  #   build:
+  #     context: ./EMS-Frontend
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - ems-user
+  #     - ems-task
+  #     - ems-report
+  #   ports:
+  #     - "3000:80"
+  #   networks:
+  #     - ems_network
+
+  frontend-dev:
+    build:
+      context: ./EMS-Frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3001:3000"  # Host:Container (Vite usually runs on 3000)
+    
+    networks:
+      - ems_network
+    depends_on:
+      - ems-user
+      - ems-task
+      - ems-report
+      - ems-leave
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
