@@ -17,6 +17,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(new AntPathRequestMatcher("/users/register"),
+                                new AntPathRequestMatcher("/email/**"),
                                 new AntPathRequestMatcher("/users/**"), new AntPathRequestMatcher("/users/update"),new AntPathRequestMatcher("/general/**")).permitAll()
                         .anyRequest().authenticated()
                 );
