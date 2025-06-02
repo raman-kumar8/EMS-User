@@ -1,12 +1,7 @@
 package com.example.emsuser.controller;
 
-import com.example.emsuser.dto.UpdateDTO;
-import com.example.emsuser.dto.UserLoginDTO;
-import com.example.emsuser.dto.UserRegisterDTO;
-import com.example.emsuser.dto.UserResponseDTO;
-import com.example.emsuser.exception.CustomException;
+import com.example.emsuser.dto.*;
 import com.example.emsuser.service.UserService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -73,6 +68,19 @@ public class UserController {
         return userService.update(token,updateDTO);
 
     }
+
+    @PostMapping("/forget")
+    public String forgotPassword(@RequestBody PasswordResetRequestDTO passwordResetRequestDTO) {
+        return userService.forgotPassword(passwordResetRequestDTO);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword( @RequestBody PasswordResetDTO passwordResetDTO)
+    {
+        return userService.resetPassword( passwordResetDTO);
+
+    }
+
 
 
 

@@ -1,17 +1,17 @@
 package com.example.emsuser.controller;
 
+import com.example.emsuser.dto.UpdateLeaveCountDTO;
 import com.example.emsuser.dto.UserDetailsResponseDTo;
+import com.example.emsuser.dto.UserResponseLeaveDTO;
 import com.example.emsuser.exception.CustomException;
 import com.example.emsuser.model.UserModel;
+import com.example.emsuser.repository.UserRepository;
 import com.example.emsuser.security.JwtTokenProvider;
 import com.example.emsuser.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -42,7 +42,26 @@ public class GeneralController {
         response.setName(user.getName());
         response.setEmail(user.getEmail());
         response.setRole(user.getRole().getRole());
+        response.setLeaveCount(user.getLeaveCount());
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/user1")
+    public ResponseEntity<UserResponseLeaveDTO> getUserById(@RequestParam UUID id)
+    {
+        UserModel user = userService.getUserById(id);
+        UserResponseLeaveDTO response = new UserResponseLeaveDTO();
+        response.setName(user.getName());
+        response.setEmail(user.getEmail());
+        response.setRole(user.getRole().getRole());
+        response.setLeaveCount(user.getLeaveCount());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/setLeaveCount")
+    public void setLeaveCount(@RequestBody UpdateLeaveCountDTO updateLeaveCountDTO)
+    {
+        userService.setLeaveCount(updateLeaveCountDTO.getUserId(),updateLeaveCountDTO.getLeaveCount());
     }
 
 }
