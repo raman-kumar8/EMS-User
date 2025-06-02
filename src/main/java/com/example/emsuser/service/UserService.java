@@ -1,26 +1,18 @@
 package com.example.emsuser.service;
 
-import com.example.emsuser.dto.UpdateDTO;
-import com.example.emsuser.dto.UserLoginDTO;
-import com.example.emsuser.dto.UserRegisterDTO;
-import com.example.emsuser.dto.UserResponseDTO;
+import com.example.emsuser.dto.*;
 import com.example.emsuser.exception.CustomException;
 import com.example.emsuser.model.UserModel;
 import com.example.emsuser.model.UserRoleModel;
 import com.example.emsuser.repository.UserRepository;
 import com.example.emsuser.repository.UserRoleRepository;
 import com.example.emsuser.security.JwtTokenProvider;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.Duration;
@@ -42,8 +34,10 @@ UserService {
     private UserRoleRepository userRoleRepository;
 
     @Autowired
-
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    EmailService emailService ;
 
 
     public ResponseEntity<UserResponseDTO> registerUser(UserRegisterDTO userRegisterDTO) {
@@ -135,18 +129,13 @@ UserService {
             }
 
 
-        if (updateDTO.getEmail() != null && !updateDTO.getEmail().equals(user.getEmail())) {
+        if (updateDTO.getEmail() != null && !updateDTO.getEmail().equals(user.getEmail()) && !updateDTO.getEmail().equals("")) {
             if (userRepository.existsByEmail(updateDTO.getEmail())) {
                 throw new CustomException("Email is already in use");
             }
             user.setEmail(updateDTO.getEmail());
         }
-        if(updateDTO.getRole()!=null && !updateDTO.getRole().equals(user.getRole().getRole()))
-        {
-            UserRoleModel userRole = user.getRole();
-                    userRole.setRole(updateDTO.getRole());
-            userRoleRepository.save(userRole);
-        }
+
 
 
             // Save the updated user
@@ -167,5 +156,29 @@ public UserModel getUserById(UUID userId){
 }
 
 
+    public void setLeaveCount(UUID userId, int leaveCount)
+    {
+        UserModel user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with id: "));
+        user.setLeaveCount(leaveCount);
+        userRepository.save(user);
+    }
 
+    public String forgotPassword(PasswordResetRequestDTO passwordResetRequestDTO) {
+        UserModel userModel = userRepository.findByEmail(passwordResetRequestDTO.getEmail());
+        if(userModel == null)
+            throw new CustomException("No User Found with this Email");
+
+        StringBuilder str = new StringBuilder();
+        str.append("http://localhost:3001/reset-password?token="+userModel.getId());
+
+        emailService.sendEmail(userModel.getEmail(), str.toString());
+        return "Mail Send";
+    }
+
+    public ResponseEntity<String> resetPassword(PasswordResetDTO passwordResetDTO) {
+        UserModel userModel = userRepository.findById(UUID.fromString(passwordResetDTO.getToken())).orElseThrow(() -> new CustomException("User not found with id: "));
+        userModel.setPassword(passwordEncoder.encode(passwordResetDTO.getNewPassword()));
+        userRepository.save(userModel);
+        return ResponseEntity.ok().body("Password Reset Successfully ");
+    }
 }

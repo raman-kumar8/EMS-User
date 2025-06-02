@@ -4,9 +4,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.util.Date;
 
@@ -33,6 +35,9 @@ public class UserModel {
     private String password;
 
 
+    @Column(nullable = false)
+    private int leaveCount = 25;
+
 
     private Date lastLogin;
 
@@ -51,6 +56,7 @@ public class UserModel {
     public String toString() {
         return "UserModel{id=" + id + ", email='" + email + "'}";
     }
+
 
 
 
