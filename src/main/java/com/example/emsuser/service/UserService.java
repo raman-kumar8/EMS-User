@@ -16,9 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.Duration;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class
@@ -181,4 +179,20 @@ public UserModel getUserById(UUID userId){
         userRepository.save(userModel);
         return ResponseEntity.ok().body("Password Reset Successfully ");
     }
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+
+        List<UserModel> users = userRepository.findAll();
+
+        List<UserResponseDTO> userDTOs = users.stream()
+                .map(user -> new UserResponseDTO(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getRole() != null ? user.getRole().getRole() : "No Role"
+                ))
+                .toList();
+
+        return ResponseEntity.ok(userDTOs);
+    }
 }
+

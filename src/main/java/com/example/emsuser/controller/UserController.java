@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 import java.time.Duration;
+import java.util.List;
 
 
 @RestController
@@ -80,6 +81,12 @@ public class UserController {
         return userService.resetPassword( passwordResetDTO);
 
     }
+
+    @GetMapping("/getAll")
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
 
 
 
