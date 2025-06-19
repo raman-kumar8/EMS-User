@@ -174,6 +174,7 @@ public UserModel getUserById(UUID userId){
     }
 
     public ResponseEntity<String> resetPassword(PasswordResetDTO passwordResetDTO) {
+
         UserModel userModel = userRepository.findById(UUID.fromString(passwordResetDTO.getToken())).orElseThrow(() -> new CustomException("User not found with id: "));
         userModel.setPassword(passwordEncoder.encode(passwordResetDTO.getNewPassword()));
         userRepository.save(userModel);
