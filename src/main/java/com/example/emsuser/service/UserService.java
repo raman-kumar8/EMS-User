@@ -167,9 +167,9 @@ public UserModel getUserById(UUID userId){
             throw new CustomException("No User Found with this Email");
 
         StringBuilder str = new StringBuilder();
-        str.append("http://localhost:3001/reset-password?token="+userModel.getId());
+        str.append("https://ems.radhexdeveloper.life/reset-password?token="+userModel.getId());
 
-        emailService.sendEmail(userModel.getEmail(), str.toString());
+        emailService.sendHtmlEmail(userModel.getEmail(), str.toString());
         return "Mail Send";
     }
 
