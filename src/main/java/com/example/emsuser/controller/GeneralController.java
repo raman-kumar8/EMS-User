@@ -50,6 +50,16 @@ public class GeneralController {
         response.setLeaveCount(user.getLeaveCount());
         return ResponseEntity.ok(response);
     }
+    @GetMapping("/id/{id}")
+        public ResponseEntity<UserDetailsResponseDTo> getUserDetails(@PathVariable("id") UUID id){
+          UserModel user = userService.getUserById(id);
+        UserDetailsResponseDTo response = new UserDetailsResponseDTo();
+        response.setName(user.getName());
+        response.setEmail(user.getEmail());
+        response.setRole(user.getRole().getRole());
+        response.setLeaveCount(user.getLeaveCount());
+        return ResponseEntity.ok(response);
+        }
 
     @GetMapping("/user1")
     public ResponseEntity<UserResponseLeaveDTO> getUserById(@RequestParam UUID id)
